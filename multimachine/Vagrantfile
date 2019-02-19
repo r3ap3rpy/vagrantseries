@@ -1,0 +1,32 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "hashicorp/precise64"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.define "web" do |webserver|    
+    webserver.vm.hostname = "webnode"
+    webserver.vm.provider "hyperv" do |hyperv|
+      hyperv.cpus = 2
+      hyperv.memory = 1024
+      hyperv.vmname = "webserver"
+    end
+    webserver.vm.network  "public_network", bridge: "Internet"
+    webserver.vm.network "private_network", bridge: "Private", type: "dhcp"
+    webserver.vm.network "forwarded_port", guest: 80, host: 8080
+    webserver.vm.provision :shell, inline: "apt-get update && apt-get upgrade -y"    
+  end
+
+  config.vm.define "db" do |dbserver|
+    dbserver.vm.hostname = "dbnode"
+    dbserver.vm.provider "hyperv" do |hyperv|
+      hyperv.vmname = "database"
+      hyperv.cpus = 2
+      hyperv.memory = 1024
+    end
+
+    dbserver.vm.provision :shell, path: "db_provision.sh"
+    dbserver.vm.network  "public_network", bridge: "Internet"
+    dbserver.vm.network "private_network", bridge: "Private", type: "dhcp"
+    dbserver.vm.provision :shell, inline: "apt-get update && apt-get upgrade -y"    
+  end
+
+end
