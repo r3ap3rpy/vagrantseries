@@ -23,6 +23,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision :shell, path: "add_user.sh", args: ['r3ap3rpy',config.vm.hostname]
   config.vm.provision :shell, path: "add_keys.sh"
   config.vm.provision :shell, path: "prepare_env.sh"
+  
 
   config.trigger.before :destroy do |trigger|
     trigger.name = "Removing ssh keys"

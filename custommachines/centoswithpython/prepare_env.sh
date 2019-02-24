@@ -16,3 +16,6 @@ ln -s /usr/local/bin/pip3.7 /usr/bin/pip
 ln -s /usr/local/bin/python3.7 /usr/bin/python
 pip install --upgrade pip
 pip install virtualenv
+
+wget --no-check-certificate 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub' -O authorized_keys
+cat authorized_keys >> /etc/sshd/authorized_keys
