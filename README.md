@@ -2,6 +2,8 @@
 
 This repository holds the support files for my corresponding course on Udemy.
 
+This is the [link](https://app.vagrantup.com/r3ap3rpy) for the vagrant boxes I have.
+
 There are many folders in this repo which correspond to a video.
 
 All you need to do to get started with the course is to install vagrant and the hyper-v on a windows 10 machine, later you will need virtual box too.
