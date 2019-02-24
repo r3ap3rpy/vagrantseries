@@ -1,0 +1,33 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.hostname = "centos"
+ 
+  config.vm.network "public_network", ip: "192.168.0.172", bridge: "Wi-Fi"
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "F:\\", "/fdrive",
+    { 
+      disabled: false, 
+      type: "smb",
+      mount_options:['vers=3.0'],
+      smb_username: ENV['SMB_USER'],
+      smb_password: ENV['SMB_PASS'] 
+    }
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "centos"
+    vb.memory = "1024"
+    vb.cpus = 2
+  end
+
+  config.vm.provision :shell, path: "configure_ssh.sh"
+  config.vm.provision :shell, path: "add_user.sh", args: ['r3ap3rpy',config.vm.hostname]
+  config.vm.provision :shell, path: "add_keys.sh"
+  config.vm.provision :shell, path: "prepare_env.sh"
+
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "Removing ssh keys"
+    trigger.run_remote = { path: "delete_keys.sh"}
+  end
+
+  config.vm.post_up_message = "Your VM is ready for use."
+end

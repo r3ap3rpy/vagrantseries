@@ -1,0 +1,1 @@
+for file in ` ls -1 /fdrive/keys/ | grep pub | grep -v $(hostname)`; do  cat /fdrive/keys/$file >> /etc/ssh/authorized_keys; done
