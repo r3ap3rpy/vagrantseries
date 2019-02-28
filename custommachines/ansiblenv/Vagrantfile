@@ -1,0 +1,52 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "F:\\", "/fdrive",
+    { 
+      disabled: false, 
+      type: "smb",
+      mount_options:['vers=3.0'],
+      smb_username: ENV['SMB_USER'],
+      smb_password: ENV['SMB_PASS'] 
+    }
+
+  config.vm.provision "shell", path: "configure_ssh.sh"
+  config.vm.provision "shell", path: "add_user.sh", args: ['ansible']
+  config.vm.provision "shell", path: "add_keys.sh"
+
+  config.vm.define "ansiblemaster" do |master|    
+    master.vm.hostname = "AMaster"
+    master.vm.provider "virtualbox" do |vb|
+      vb.cpus = 2
+      vb.memory = 1024
+      vb.name = "AMaster"
+    end
+    master.vm.provision "last", type: "shell", path: "prepare_master.sh"
+    master.vm.network "public_network", ip: "192.168.0.190", bridge: "Wi-Fi"
+  end
+
+  config.vm.define "ansibleagenta" do |agent|
+    agent.vm.hostname = "AAgentA"
+    agent.vm.provider "virtualbox" do |vb|
+      vb.name = "AAgentA"
+      vb.cpus = 1
+      vb.memory = 1024
+    end    
+    agent.vm.network "public_network", ip: "192.168.0.191", bridge: "Wi-Fi"
+  end
+
+  config.vm.define "ansibleagentb" do |agent|
+    agent.vm.hostname = "AAgentB"
+    agent.vm.provider "virtualbox" do |vb|
+      vb.name = "AAgentB"
+      vb.cpus = 1
+      vb.memory = 1024
+    end
+    agent.vm.network "public_network", ip: "192.168.0.192", bridge: "Wi-Fi"
+  end
+ 
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "Removing ssh keys"
+    trigger.run_remote = { path: "delete_keys.sh"}
+  end
+end
