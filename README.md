@@ -8,6 +8,7 @@ There are many folders in this repo which correspond to a video.
 
 All you need to do to get started with the course is to install vagrant and the hyper-v on a windows 10 machine, later you will need virtual box too.
 
+
 Some vagrant commands which are needed:
  - vagrant up
  - vagrant suspend 
