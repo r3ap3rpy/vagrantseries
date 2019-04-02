@@ -1,7 +1,6 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "centos/7"
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder "F:\\", "/fdrive",
+  config.vm.synced_folder "C:\\users\\r3ap3rpy\\Documents\\", "/fdrive",
     { 
       disabled: false, 
       type: "smb",
@@ -14,39 +13,41 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "add_user.sh", args: ['ansible']
   config.vm.provision "shell", path: "add_keys.sh"
 
+
   config.vm.define "ansiblemaster" do |master|    
+    master.vm.box = "centos/7"
     master.vm.hostname = "AMaster"
     master.vm.provider "virtualbox" do |vb|
       vb.cpus = 2
-      vb.memory = 1024
+      vb.memory = 2048
       vb.name = "AMaster"
     end
     master.vm.provision "last", type: "shell", path: "prepare_master.sh"
-    master.vm.network "public_network", ip: "192.168.0.190", bridge: "Wi-Fi"
+    config.vm.provision "install_mitogen.sh", type: "shell", path: "install_mitogen.sh"
+    config.vm.provision "set_ansible_permissions.sh", type: "shell", path: "set_ansible_permissions.sh"
+    master.vm.network "public_network", ip: "192.168.0.190"
   end
 
   config.vm.define "ansibleagenta" do |agent|
-    agent.vm.hostname = "AAgentA"
+    agent.vm.box = "centos/7"
+    agent.vm.hostname = "centosA"
     agent.vm.provider "virtualbox" do |vb|
-      vb.name = "AAgentA"
+      vb.name = "centosA"
       vb.cpus = 1
       vb.memory = 1024
     end    
-    agent.vm.network "public_network", ip: "192.168.0.191", bridge: "Wi-Fi"
+    agent.vm.network "public_network", ip: "192.168.0.191"
   end
 
   config.vm.define "ansibleagentb" do |agent|
-    agent.vm.hostname = "AAgentB"
+    agent.vm.box = "centos/7"
+    agent.vm.hostname = "centosB"
     agent.vm.provider "virtualbox" do |vb|
-      vb.name = "AAgentB"
+      vb.name = "centosB"
       vb.cpus = 1
       vb.memory = 1024
     end
-    agent.vm.network "public_network", ip: "192.168.0.192", bridge: "Wi-Fi"
+    agent.vm.network "public_network", ip: "192.168.0.192"
   end
- 
-  config.trigger.before :destroy do |trigger|
-    trigger.name = "Removing ssh keys"
-    trigger.run_remote = { path: "delete_keys.sh"}
-  end
+
 end

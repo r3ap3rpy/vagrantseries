@@ -1,0 +1,17 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.hostname = "AWX"
+ 
+  config.vm.network "public_network", ip: "192.168.0.200"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "AWX"
+    vb.memory = "4096"
+    vb.cpus = 4
+  end
+
+  config.vm.provision "install_awx_manage", type: "shell", path: "install_awx_manage.sh"
+  config.vm.post_up_message = "Your VM is ready for use."
+end
+

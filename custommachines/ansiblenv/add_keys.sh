@@ -1,1 +1,1 @@
-cat /fdrive/keys/AMaster.pub >> /etc/ssh/authorized_keys
+cat /fdrive/Vagrant/keys/AMaster.pub >> /etc/ssh/authorized_keys

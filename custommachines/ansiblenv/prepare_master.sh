@@ -8,16 +8,24 @@ sed -i -e 's/#inventory/inventory/g' /etc/ansible/ansible.cfg
 
 echo "[all]" > /etc/ansible/hosts
 echo "AMaster" >> /etc/ansible/hosts
-echo "AAgentA" >> /etc/ansible/hosts
-echo "AAgentB" >> /etc/ansible/hosts
+echo "centosA" >> /etc/ansible/hosts
+echo "centosB" >> /etc/ansible/hosts
+echo "raspberry" >> /etc/ansible/hosts
 echo "" >> /etc/ansible/hosts
 echo "[agents]" >> /etc/ansible/hosts
-echo "AAgentA" >> /etc/ansible/hosts
-echo "AAgentB" >> /etc/ansible/hosts
+echo "centosA" >> /etc/ansible/hosts
+echo "centosB" >> /etc/ansible/hosts
+echo "raspberry" >> /etc/ansible/hosts
+echo "" >> /etc/ansible/hosts
+echo "" >> /etc/ansible/hosts
+echo "[centos]" >> /etc/ansible/hosts
+echo "centosA" >> /etc/ansible/hosts
+echo "centosB" >> /etc/ansible/hosts	
 echo "" >> /etc/ansible/hosts
 echo "[master]" >> /etc/ansible/hosts
 echo "AMaster" >> /etc/ansible/hosts
 
 echo "192.168.0.190 AMaster" >> /etc/hosts
-echo "192.168.0.191 AAgentA" >> /etc/hosts
-echo "192.168.0.192 AAgentB" >> /etc/hosts
+echo "192.168.0.191 centosA" >> /etc/hosts
+echo "192.168.0.192 centosB" >> /etc/hosts
+echo "192.168.0.150 raspberry" >> /etc/hosts
