@@ -61,5 +61,6 @@ Vagrant.configure("2") do |config|
   end
   config.trigger.before :destroy do |trigger|
     trigger.run_remote = {inline: "rm -f /fdrive/Vagrant/keys/$(hostname).pub;rm -f /fdrive/Vagrant/keys/$(hostname)"}
+    trigger.on_error = :continue
   end
 end
