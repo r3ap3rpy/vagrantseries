@@ -1,0 +1,57 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "C:\\users\\r3ap3rpy\\Documents\\", "/fdrive",
+    { 
+      disabled: false, 
+      type: "smb",
+      mount_options:['vers=3.0'],
+      smb_username: ENV['SMB_USER'],
+      smb_password: ENV['SMB_PASS'] 
+    }
+
+  config.vm.provision "base", type: "shell", path: "configure_ssh.sh"
+  config.vm.provision "shell", path: "add_user.sh", args: ['puppet']
+  config.vm.provision "shell", path: "add_keys.sh"
+
+  config.vm.define "puppetmaster" do |master|    
+    master.vm.hostname = "PMaster"
+    master.vm.provider "virtualbox" do |vb|
+      vb.cpus = 2
+      vb.memory = 2048
+      vb.name = "puppetmaster"
+    end
+    master.vm.network "public_network", ip: "192.168.0.220", bridge: "Wi-Fi"
+    master.vm.provision :shell, path: "bootstrap_master.sh"
+
+  end
+
+  config.vm.define "puppetagenta" do |agent|
+    agent.vm.hostname = "PAgentA"
+    agent.vm.provider "virtualbox" do |vb|
+      vb.name = "puppetagentA"
+      vb.cpus = 1
+      vb.memory = 1024
+    end
+
+    agent.vm.network "public_network", ip: "192.168.0.221", bridge: "Wi-Fi"
+    agent.vm.provision :shell, path: "bootstrap_agent.sh"
+  end
+
+  config.vm.define "puppetagentb" do |agent|
+    agent.vm.hostname = "PAgentB"
+    agent.vm.provider "virtualbox" do |vb|
+      vb.name = "puppetagentB"
+      vb.cpus = 1
+      vb.memory = 1024
+    end
+
+    agent.vm.network "public_network", ip: "192.168.0.222", bridge: "Wi-Fi"
+    agent.vm.provision :shell, path: "bootstrap_agent.sh"
+  end
+
+  config.trigger.before :destroy do |trigger|
+    trigger.run_remote = {inline: "rm -f /fdrive/Vagrant/keys/$(hostname).pub;rm -f /fdrive/Vagrant/keys/$(hostname)"}
+    trigger.on_error = :continue
+  end
+end

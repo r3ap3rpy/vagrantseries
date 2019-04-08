@@ -1,0 +1,1 @@
+cat /fdrive/Vagrant/keys/PMaster.pub >> /etc/ssh/authorized_keys

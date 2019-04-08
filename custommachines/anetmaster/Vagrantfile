@@ -1,0 +1,68 @@
+Vagrant.configure("2") do |config|
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "C:\\users\\r3ap3rpy\\Documents\\", "/fdrive",
+    { 
+      disabled: false, 
+      type: "smb",
+      mount_options:['vers=3.0'],
+      smb_username: ENV['SMB_USER'],
+      smb_password: ENV['SMB_PASS'] 
+    }
+
+  config.vm.provision "shell", path: "configure_ssh.sh"
+  config.vm.provision "shell", path: "add_user.sh", args: ['ansible']
+  config.vm.provision "shell", path: "add_keys.sh"
+
+
+  config.vm.define "ANetMaster" do |master|    
+    master.vm.box = "centos/7"
+    master.vm.hostname = "ANetMaster"
+    master.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--nic3", "hostonly", "--cableconnected3", "on", "--hostonlyadapter3", "VirtualBox Host-Only Ethernet Adapter #2"]
+      vb.cpus = 1
+      vb.memory = 1024
+      vb.name = "ANetMaster"
+    end
+    master.vm.provision "last", type: "shell", path: "prepare_master.sh"
+    master.vm.provision "install_mitogen.sh", type: "shell", path: "install_mitogen.sh"
+    master.vm.provision "set_ansible_permissions.sh", type: "shell", path: "set_ansible_permissions.sh"
+    master.vm.network "public_network", ip: "192.168.0.230"
+  end
+
+
+
+  config.trigger.before :destroy do |trigger|
+    trigger.run_remote = {inline: "rm -f /fdrive/Vagrant/keys/$(hostname).pub;rm -f /fdrive/Vagrant/keys/$(hostname)"}
+    
+    trigger.on_error = :continue
+  end
+
+end
+
+#Router(config)#hostname GeekRtr
+# GeekRtr(config)#ip domain-name mustbegeek.com
+# GeekRtr(config)#username admin password letmein123
+# GeekRtr(config)#username admin privilege 15
+# GeekRtr(config)#username monitor password letmesee123
+# GeekRtr(config)#enable password letmeconfig123
+#
+#
+# GeekRtr(config)#interface fa0/1
+#GeekRtr(config-if)#ip address 192.168.0.1 255.255.255.0
+#GeekRtr(config-if)#no shutdown
+#
+#  GeekRtr(config)#crypto key generate rsa
+#The name for the keys will be: GeekRtr.mustbegeek.com
+#Choose the size of the key modulus in the range of 360 to 2048 for your
+# General Purpose Keys. Choosing a key modulus greater than 512 may take
+# a few minutes.
+#
+#How many bits in the modulus [512]: 1024
+#
+#GeekRtr(config)#ip ssh version 2
+#
+#GeekRtr(config)#line vty 0 4
+# GeekRtr(config-line)#transport input ssh
+# GeekRtr(config-line)#login local
+
+
